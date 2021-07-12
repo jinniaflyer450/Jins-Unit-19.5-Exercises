@@ -5,7 +5,7 @@
 <h2>Instructions:</h2>
 <p>After beginning the game, find words on the resulting 5x5 grid. Words can be created from adjacent letters; individual letter tiles may not be reused. Enter them into the given input. If the word is valid, points will be added to your score.</p>
 <h2>The Game:</h2>
-<div id= 'game'>
+<div id='game'>
     {% for row in board %}
     <div>
         {% for letter in row %}
@@ -14,4 +14,9 @@
     </div>
     {% endfor %}
 </div>
+<form id='guess-form' method='POST' action='/guess'>
+    <label for='guess'>Your guess:</label>
+    <input type='text' placeholder='Enter a word here' id='guess' name='guess'>
+    <button>Guess</button>
+</form>
 {% endblock %}
