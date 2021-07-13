@@ -11,7 +11,7 @@ const response = $(function(){
         console.log('Game ended!');
         const response = await axios.get('/end-game', {'params': {'finalScore': currentScore}});
         return response;
-    }, 60000)
+    }, 5000)
 })
 
 $guessForm.on('submit', async function(evt){
