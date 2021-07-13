@@ -30,5 +30,10 @@ def submit_guess():
     is_valid_and_on_board = boggle_game.check_valid_word(session['board'], guess)
     return jsonify(result=is_valid_and_on_board)
 
+@app.route('/end-game')
+def end_game():
+    final_score = request.args['finalScore']
+    return redirect('/')
+
 
 #Got some help with jsonify here: https://www.kite.com/python/docs/flask.jsonify

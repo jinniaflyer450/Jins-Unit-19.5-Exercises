@@ -5,6 +5,15 @@ const $score = $('#score-value')
 let currentScore = 0;
 $score.text(`${currentScore}`)
 
+const response = $(function(){
+    console.log('Game started');
+    setTimeout(async function(){
+        console.log('Game ended!');
+        const response = await axios.get('/end-game', {'params': {'finalScore': currentScore}});
+        return response;
+    }, 60000)
+})
+
 $guessForm.on('submit', async function(evt){
     evt.preventDefault();
     const guess = $('#guess').val();
@@ -26,4 +35,7 @@ $guessForm.on('submit', async function(evt){
     }
     $guessArea.append(newResult)
 })
+
+//https://api.jquery.com/ready/ Got advice about using "ready" here.
+
 //https://api.jquery.com/append/ Got some help with append here.
