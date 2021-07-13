@@ -1,6 +1,10 @@
 const guesses = new Set();
 const $guessForm = $('#guess-form');
 const $guessArea = $('#guesses')
+const $score = $('#score-value')
+let currentScore = 0;
+$score.text(`${currentScore}`)
+
 $guessForm.on('submit', async function(evt){
     evt.preventDefault();
     const guess = $('#guess').val();
@@ -15,6 +19,10 @@ $guessForm.on('submit', async function(evt){
         guesses.add(guess);
         const response = await axios.get('/guess', {'params': {'guess': $('#guess').val()}});
         newResult = $(`<p>Successfully guessed! Result: ${response.data.result}</p>`);
+        if(response.data.result === 'ok'){
+            currentScore += guess.length;
+            $score.text(`${currentScore}`);
+        }
     }
     $guessArea.append(newResult)
 })
