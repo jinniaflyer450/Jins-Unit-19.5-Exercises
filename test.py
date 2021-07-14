@@ -40,4 +40,3 @@ class FlaskTests(TestCase):
             response = client.get('/setup-game', follow_redirects=True)
             self.assertEqual(response.status_code, 200)
             self.assertIn('<title>A Game of Boggle</title>', response.get_data(as_text=True))
-
