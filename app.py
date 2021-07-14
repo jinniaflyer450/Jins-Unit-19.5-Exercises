@@ -26,13 +26,24 @@ def setup_board():
 
 @app.route('/show-board')
 def show_board():
+    if session.get('board', None) == None:
+        return redirect('/setup-game')
     return render_template('board.html', board=session['board'])
 
 @app.route('/guess')
 def submit_guess():
-    guess = request.args['guess']
-    is_valid_and_on_board = boggle_game.check_valid_word(session['board'], guess)
-    return jsonify(result=is_valid_and_on_board)
+    if session.get('board', None) == None:
+        return redirect('/setup-game')
+    elif request.args.get('guess', None) == None:
+        return redirect('/show-board')
+    else:
+        if session.get('game-count', None) == None:
+            session['game-count'] = 0
+        if session.get('high-score', None) == None:
+            session['high-score'] = 0
+        guess = request.args['guess']
+        is_valid_and_on_board = boggle_game.check_valid_word(session['board'], guess)
+        return jsonify(result=is_valid_and_on_board)
 
 @app.route('/stop-timer')
 def stop_timer():
