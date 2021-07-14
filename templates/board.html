@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}A Game of Boggle{% endblock %}
 {% block content %}
-{% for msg in get_flashed_messages() %}<p>{{msg}}</p>{% endfor %}
 <h1>Boggle</h1>
 <h2>Instructions:</h2>
 <p>After beginning the game, find words on the resulting 5x5 grid. Words can be created from adjacent letters; individual letter tiles may not be reused. Enter them into the given input. If the word is valid, points will be added to your score. The game will last for 60 seconds, at which point no more guesses may be made.</p>
@@ -26,6 +25,8 @@
     <span id="score-value"></span>
     <label for="games-played">Games played:</label>
     <span id="games-played">{{session['game-count']}}</span>
+    <label for="high-score">High score:</label>
+    <span id="high-score">{{session['high-score']}}</span>
 </div>
 <div id="guesses"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

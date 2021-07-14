@@ -3,5 +3,7 @@
 {% block content %}
 <h1>Game End!</h1>
 <p>Your score: {{finalScore}}</p>
+<p>Session high score: {{session['high-score']}}</p>
+<p>Games played: {{session['game-count']}}</p>
 <a href='/setup-game'>Play again?</a>
 {% endblock %}

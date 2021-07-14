@@ -10,6 +10,8 @@ final_score = None
 
 @app.route('/')
 def display_start():
+    session['game-count'] = 0
+    session['high-score'] = None
     return render_template('start_game.html')
 
 @app.route('/setup-game')
@@ -31,13 +33,16 @@ def submit_guess():
 @app.route('/stop-timer')
 def stop_timer():
     global final_score
+    session['game-count'] += 1
     final_score = int(request.args['finalScore'])
+    if session['high-score'] == None or session['high-score'] <= final_score:
+        session['high-score'] = final_score
     return jsonify(redirect='/post-game')
 
 @app.route('/post-game')
 def end_game():
     return render_template('post_game.html', finalScore = final_score)
-    
+
 #Got some help with jsonify here: https://www.kite.com/python/docs/flask.jsonify
 #Figured out how to get my page to redirect properly here. 
 #https://stackoverflow.com/questions/56932954/flask-redirect-not-working-but-i-dont-get-any-errors
