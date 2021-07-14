@@ -58,9 +58,12 @@ def submit_guess():
 @app.route('/stop-timer')
 def stop_timer():
     """After the time for the game has run out, updates game-count in session (adding 1) and final_score as a global variable 
-    from the query string. If final_score is the new high score, updates high-score in session. Then, sends data in JSON that
-    allows for automatic redirection to the /post-game route."""
+    from the query string. If game-count or high-score do not exist in session, redirects to '/setup-game'.
+    If final_score is the new high score, updates high-score in session. Then, sends data in JSON that allows for automatic redirection 
+    to the /post-game route."""
     global final_score
+    if session.get('game-count', None) == None or session.get('high-score', None) == None or request.args.get('finalScore', None) == None:
+        return redirect('/setup-game')
     session['game-count'] += 1
     final_score = int(request.args['finalScore'])
     if session['high-score'] == None or session['high-score'] <= final_score:
@@ -70,7 +73,12 @@ def stop_timer():
 @app.route('/post-game')
 def end_game():
     """Returns the HTML page that displays that the game has ended, the number of times played, the high score, and the
-    final score."""
+    final score. If final_score is not initialized, sets it to 0."""
+    global final_score
+    if final_score == None:
+        final_score = 0
+    if session.get('game-count', None) == None or session.get('high-score', None) == None:
+        return redirect('/setup-game')
     return render_template('post_game.html', finalScore = final_score)
 
 #Got some help with jsonify here: https://www.kite.com/python/docs/flask.jsonify

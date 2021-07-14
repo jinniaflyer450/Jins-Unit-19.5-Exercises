@@ -108,3 +108,92 @@ class FlaskTests(TestCase):
             response = client.get('/guess?guess=adj')
             self.assertEqual(session['game-count'], 10)
             self.assertEqual(session['high-score'], 30)
+
+    def test_stop_timer_redirects(self):
+        """Tests that if some joker decides to go to /stop-timer without having the required session variables or query string, 
+        the view function redirects to '/setup-game' to get them. Also tests if the route returns the right JSON if someone
+        accesses it correctly."""
+        with app.test_client() as client:
+            with client.session_transaction() as change_session:
+                change_session['high-score'] = 0
+            response = client.get('/stop-timer?finalScore=0')
+            self.assertEqual(response.status_code, 302)
+            response = client.get('/stop-timer?finalScore=0', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<title>A Game of Boggle</title>', response.get_data(as_text=True))
+            with client.session_transaction() as change_session:
+                change_session['high-score'] = None
+                change_session['game-count'] = 0
+            response = client.get('/stop-timer?finalScore=0')
+            self.assertEqual(response.status_code, 302)
+            response = client.get('/stop-timer?finalScore=0', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<title>A Game of Boggle</title>', response.get_data(as_text=True))
+            with client.session_transaction() as change_session:
+                change_session['high-score'] = 0
+                change_session['game-count'] = 0
+            response = client.get('/stop-timer')
+            self.assertEqual(response.status_code, 302)
+            response = client.get('/stop-timer', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<title>A Game of Boggle</title>', response.get_data(as_text=True))
+            response = client.get('/stop-timer?finalScore=0')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.get_data(as_text=True).strip(), '{"redirect":"/post-game"}')
+    
+    def test_stop_timer_session(self):
+        """Tests if hitting the /stop-timer route updates session['game-count'] by +1 and sends finalScore in the query
+        string to session['high-score'] if and only if finalScore is higher than or equal to high-score"""
+        with app.test_client() as client:
+            with client.session_transaction() as change_session:
+                change_session['high-score'] = 0
+                change_session['game-count'] = 0
+            response = client.get('/stop-timer?finalScore=10')
+            self.assertEqual(session['game-count'], 1)
+            self.assertEqual(session['high-score'], 10)
+            with client.session_transaction() as change_session:
+                change_session['high-score'] = 15
+                change_session['game-count'] = 0
+            response = client.get('/stop-timer?finalScore=5')
+            self.assertEqual(session['game-count'], 1)
+            self.assertEqual(session['high-score'], 15)
+            with client.session_transaction() as change_session:
+                change_session['high-score'] = 5
+                change_session['game-count'] = 5
+            response = client.get('/stop-timer?finalScore=0')
+            self.assertEqual(session['game-count'], 6)
+            self.assertEqual(session['high-score'], 5)
+    
+    def test_end_game_return(self):
+        """Tests if hitting the /end-game route returns 'post_game.html'."""
+        with app.test_client() as client:
+            with client.session_transaction() as change_session:
+                change_session['high-score'] = 0
+                change_session['game-count'] = 1
+            response = client.get('/post-game')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<title>Game End!</title>', response.get_data(as_text=True))
+    
+    def test_end_game_redirects(self):
+        """Tests if some joker hitting the end-game route without session variables instantiated redirects to /setup-game and 
+        eventually to /show-board."""
+        with app.test_client() as client:
+            with client.session_transaction() as change_session:
+                change_session['game-count'] = 1
+                change_session['high-score'] = None
+            response= client.get('/post-game')
+            self.assertEqual(response.status_code, 302)
+            response=client.get('/post-game', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<title>A Game of Boggle</title>', response.get_data(as_text=True))
+            with client.session_transaction() as change_session:
+                change_session['game-count'] = None
+                change_session['high-score'] = 0
+            response=client.get('/post-game')
+            self.assertEqual(response.status_code, 302)
+            response=client.get('/post-game', follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<title>A Game of Boggle</title>', response.get_data(as_text=True))
+
+
+
