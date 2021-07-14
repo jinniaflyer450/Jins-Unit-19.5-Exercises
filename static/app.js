@@ -9,9 +9,9 @@ const response = $(function(){
     console.log('Game started');
     setTimeout(async function(){
         console.log('Game ended!');
-        const response = await axios.get('/end-game', {'params': {'finalScore': currentScore}});
-        return response;
-    }, 5000)
+        const response = await axios.get('/stop-timer', {'params': {'finalScore': currentScore}});
+        window.location.href = response.data.redirect;
+    }, 60000)
 })
 
 $guessForm.on('submit', async function(evt){
