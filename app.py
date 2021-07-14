@@ -11,13 +11,17 @@ final_score = None
 @app.route('/')
 def display_start():
     session['game-count'] = 0
-    session['high-score'] = None
+    session['high-score'] = 0
     return render_template('start_game.html')
 
 @app.route('/setup-game')
 def setup_board():
     board = boggle_game.make_board()
     session['board'] = board
+    if session.get('game-count', None) == None:
+        session['game-count'] = 0
+    if session.get('high-score', None) == None:
+        session['high-score'] = 0
     return redirect('/show-board')
 
 @app.route('/show-board')

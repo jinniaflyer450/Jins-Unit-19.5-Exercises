@@ -12,7 +12,7 @@ class FlaskTests(TestCase):
         with app.test_client() as client:
             response = client.get('/')
             self.assertEqual(session['game-count'], 0)
-            self.assertIsNone(session['high-score'])
+            self.assertEqual(session['high-score'], 0)
             self.assertIn('<title>Starting the Game</title>', response.get_data(as_text=True))
 
 #https://www.geeksforgeeks.org/python-unittest-assertin-function/ First key, then container.
@@ -32,11 +32,23 @@ class FlaskTests(TestCase):
                     self.assertEqual(len(possibleCharacter), 1)
 
     def test_setup_game_requests(self):
-        """Tests if accessing the setup_game route returns a response with a 302 (redirect) status code.
+        """Tests if accessing the setup_game route returns a response with a 302 (redirect) status code and if the session is set up.
         Then, tests if accessing the setup_game route and following the redirect returns 'board.html'"""
         with app.test_client() as client:
             response = client.get('/setup-game')
+            self.assertEqual(session['game-count'], 0)
+            self.assertEqual(session['high-score'], 0)
             self.assertEqual(response.status_code, 302)
             response = client.get('/setup-game', follow_redirects=True)
             self.assertEqual(response.status_code, 200)
             self.assertIn('<title>A Game of Boggle</title>', response.get_data(as_text=True))
+
+    def test_setup_game_session(self):
+        """Tests if session values set from previous playthroughs are retained after accessing the setup_game route."""
+        with app.test_client() as client:
+            with client.session_transaction() as change_session:
+                change_session['game-count'] = 5
+                change_session['high-score'] = 10
+            response = client.get('/setup-game')
+            self.assertEqual(session['game-count'], 5)
+            self.assertEqual(session['high-score'], 10)
